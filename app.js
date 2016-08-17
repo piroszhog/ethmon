@@ -72,7 +72,29 @@ module.exports = app;
 var config = require('./config.json');
 
 var log4js = require('log4js');
+var logstashLogger;
+
+if (config.logstash_enable) {
+	log4js.configure({
+	  "appenders": [
+		{
+			"host": config.logstash_host,
+			"port": config.logstash_port,
+			"type": "logstashUDP",
+			"logType": "miner",
+			"layout": {
+				"type": "pattern",
+				"pattern": "%m"
+			},
+			"category": "miner"
+		}
+	  ]
+	});
+	logstashLogger = log4js.getLogger("miner");
+}
+
 var logger = log4js.getLogger();
+
 logger.setLevel(config.log_level ? config.log_level : 'INFO');
 
 logger.warn('app: booting');
@@ -184,6 +206,30 @@ config.miners.forEach(function(item, i, arr) {
                 c.last_good = moment().format("YYYY-MM-DD HH:mm:ss");
             }
         }
+		
+		if (logstashLogger)
+		{
+			var jsonForLogstash = {
+				"name"		: m.name,
+				"host"		: hostname(),
+				"uptime"	: miners.json[i].eth.uptime,
+				"temps"		: miners.json[i].temps.split(';'),
+				"pools"		: miners.json[i].pools.split(';'),
+				"minerVersion"	: miners.json[i].ver,
+				"offline"	: miners.json[i].offline,
+				"last_good"	: miners.json[i].last_good,		
+				"ethSumHR"	: parseInt(miners.json[i].eth.split(';')[0], 10),
+				"dcrSumHR"	: parseInt(miners.json[i].dcr.split(';')[0], 10)
+			};
+
+			for (var j = 0; j < miners.json[i].eth_hr.split(';').length; ++j){
+				jsonForLogstash["eth" + j.toString() + "hr"] = parseInt(miners.json[i].eth_hr.split(';')[j], 10);
+				jsonForLogstash["dcr" + j.toString() + "hr"] = parseInt(miners.json[i].dcr_hr.split(';')[j], 10);
+			}
+
+			logstashLogger.info("got stats", jsonForLogstash);
+		}
+	
     })
 
     .on('close', function() {
@@ -212,6 +258,23 @@ config.miners.forEach(function(item, i, arr) {
             "error"      : e.name + ': ' + e.message,
             "last_seen"  : c.last_seen ? c.last_seen : 'never'
         };
+		
+		if (logstashLogger)
+		{
+			var jsonForLogstash = {
+				"name"		: m.name,
+				"host"		: hostname(),
+				"uptime"	: "",
+				"temps"		: "",
+				"pools"		: "",
+				"minerVersion"	: "",
+				"offline"	: miners.json[i].offline,				
+				"error"		: miners.json[i].error,
+			};
+			
+			logstashLogger.info("got stats", jsonForLogstash);
+		}
+		
     });
 
     function poll() {

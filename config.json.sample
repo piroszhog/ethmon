@@ -7,6 +7,9 @@
     "tolerance": 5,
     "temperature": 70,
     "hashrates": false,
+	"logstash_enable": true,
+	"logstash_host": "123.123.123.123",
+	"logstash_port": 5000,
     "miners": [
         {
             "name": "rig01",
