@@ -10,6 +10,7 @@
 	"logstash_enable": true,
 	"logstash_host": "123.123.123.123",
 	"logstash_port": 5000,
+	"object_id": "object0",
     "miners": [
         {
             "name": "rig01",

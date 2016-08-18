@@ -210,6 +210,7 @@ config.miners.forEach(function(item, i, arr) {
 		if (logstashLogger)
 		{
 			var jsonForLogstash = {
+				"object"	: config.object_id,
 				"name"		: m.name,
 				"host"		: hostname(),
 				"uptime"	: miners.json[i].eth.uptime,
@@ -262,6 +263,7 @@ config.miners.forEach(function(item, i, arr) {
 		if (logstashLogger)
 		{
 			var jsonForLogstash = {
+				"object"	: config.object_id,
 				"name"		: m.name,
 				"host"		: hostname(),
 				"uptime"	: "",
