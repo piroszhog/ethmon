@@ -214,7 +214,6 @@ config.miners.forEach(function(item, i, arr) {
 				"name"		: m.name,
 				"host"		: hostname(),
 				"uptime"	: miners.json[i].eth.uptime,
-				"temps"		: miners.json[i].temps.split(';'),
 				"pools"		: miners.json[i].pools.split(';'),
 				"minerVersion"	: miners.json[i].ver,
 				"offline"	: miners.json[i].offline,
@@ -226,6 +225,7 @@ config.miners.forEach(function(item, i, arr) {
 			for (var j = 0; j < miners.json[i].eth_hr.split(';').length; ++j){
 				jsonForLogstash["eth" + j.toString() + "hr"] = parseInt(miners.json[i].eth_hr.split(';')[j], 10);
 				jsonForLogstash["dcr" + j.toString() + "hr"] = parseInt(miners.json[i].dcr_hr.split(';')[j], 10);
+				jsonForLogstash["temp" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j], 10);
 			}
 
 			logstashLogger.info("got stats", jsonForLogstash);
