@@ -225,7 +225,8 @@ config.miners.forEach(function(item, i, arr) {
 			for (var j = 0; j < miners.json[i].eth_hr.split(';').length; ++j){
 				jsonForLogstash["eth" + j.toString() + "hr"] = parseInt(miners.json[i].eth_hr.split(';')[j], 10);
 				jsonForLogstash["dcr" + j.toString() + "hr"] = parseInt(miners.json[i].dcr_hr.split(';')[j], 10);
-				jsonForLogstash["temp" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j], 10);
+				jsonForLogstash["temp" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j*2], 10);
+				jsonForLogstash["fan" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j*2+1], 10);
 			}
 
 			logstashLogger.info("got stats", jsonForLogstash);
