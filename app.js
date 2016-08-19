@@ -234,6 +234,7 @@ config.miners.forEach(function(item, i, arr) {
 			}
 
 			logstashLogger.info("got stats", jsonWithoutError);
+            jsonWithoutError = {};
 		}
 	
     })
@@ -280,6 +281,7 @@ config.miners.forEach(function(item, i, arr) {
 			};
 			
 			logstashLogger.info("got stats", jsonWithError);
+            jsonWithError = {};
 		}
 		
     });
