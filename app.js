@@ -209,20 +209,21 @@ config.miners.forEach(function(item, i, arr) {
 		if (statsLogger)
 		{
 			var jsonWithoutError = {
-				"object"		: config.object_id,
-				"name"			: m.name,
-				"host"			: hostname(),
-				"uptime"		: miners.json[i].eth.uptime,
-				"pools"			: miners.json[i].pools.split(';'),
-				"minerVersion"	: miners.json[i].ver,
-				"offline"		: miners.json[i].offline,
-				"last_good"		: miners.json[i].last_good,		
-				"ethSumHR"		: parseInt(miners.json[i].eth.split(';')[0], 10),
-				"ethAccepted"	: parseInt(miners.json[i].eth.split(';')[1], 10),
-				"ethRejected"	: parseInt(miners.json[i].eth.split(';')[2], 10),
-				"dcrSumHR"		: parseInt(miners.json[i].dcr.split(';')[0], 10),
-				"dcrAccepted"	: parseInt(miners.json[i].dcr.split(';')[1], 10),
-				"dcrRejected"	: parseInt(miners.json[i].dcr.split(';')[2], 10)
+				"object"		    : config.object_id,
+                "socket_response"   : data.toString().trim(),
+				"name"			    : m.name,
+				"host"			    : hostname(),
+				"uptime"		    : miners.json[i].eth.uptime,
+				"pools"			    : miners.json[i].pools.split(';'),
+				"minerVersion"	    : miners.json[i].ver,
+				"offline"		    : miners.json[i].offline,
+				"last_good"		    : miners.json[i].last_good,		
+				"ethSumHR"		    : parseInt(miners.json[i].eth.split(';')[0], 10),
+				"ethAccepted"	    : parseInt(miners.json[i].eth.split(';')[1], 10),
+				"ethRejected"	    : parseInt(miners.json[i].eth.split(';')[2], 10),
+				"dcrSumHR"		    : parseInt(miners.json[i].dcr.split(';')[0], 10),
+				"dcrAccepted"	    : parseInt(miners.json[i].dcr.split(';')[1], 10),
+				"dcrRejected"	    : parseInt(miners.json[i].dcr.split(';')[2], 10)
 			};
 
 			for (var j = 0; j < miners.json[i].eth_hr.split(';').length; ++j){
