@@ -81,23 +81,29 @@ if (config.logstash_enable) {
 			"host": config.logstash_host,
 			"port": config.logstash_port,
 			"type": "logstashUDP",
-			"logType": "miner",
+			"logType": "miner_stats",
 			"layout": {
 				"type": "pattern",
 				"pattern": "%m"
 			},
-			"category": "miner"
-		}
+			"category": "miner_stats"
+		},
+        {
+            "host": config.logstash_host,
+			"port": config.logstash_port,
+			"type": "logstashUDP",
+			"logType": "miner_errors",
+			"layout": {
+				"type": "pattern",
+				"pattern": "%m"
+			},
+			"category": "miner_errors"
+        }
 	  ]
 	});
-	logstashLogger = log4js.getLogger("miner");
+	var statsLogger = log4js.getLogger("miner_stats");
+    var errorsLogger = log4js.getLogger("miner_errors");
 }
-
-var logger = log4js.getLogger();
-
-logger.setLevel(config.log_level ? config.log_level : 'INFO');
-
-logger.warn('app: booting');
 
 // --------------- /BOOT ---------------
 
@@ -110,11 +116,8 @@ require("moment-duration-format");
 var miners = [];
 miners.json = [];
 
-logger.info('config: ' + config.miners.length + ' rig(s) configured');
-
 config.miners.forEach(function(item, i, arr) {
-    logger.trace(item.name + ': config[' + i + ']');
-
+    
     // settings
     var m = miners[i] = {};
     var c = config.miners[i];
@@ -142,16 +145,13 @@ config.miners.forEach(function(item, i, arr) {
     m.socket = new net.Socket()
 
     .on('connect', function() {
-        logger.info(m.name + ': connected to ' + m.socket.remoteAddress + ':' + m.socket.remotePort);
         var req = '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}';
         ++m.reqCnt;
-        logger.trace(m.name + ': req[' + m.reqCnt + ']: ' + req);
         m.socket.write(req + '\n');
         m.socket.setTimeout(m.timeout);
     })
 
     .on('timeout', function() {
-        logger.warn(m.name + ': response timeout');
         m.socket.destroy();
         miners.json[i] = {
             "name"       : m.name,
@@ -176,7 +176,6 @@ config.miners.forEach(function(item, i, arr) {
 
     .on('data', function(data) {
         ++m.rspCnt;
-        logger.trace(m.name + ': rsp[' + m.rspCnt + ']: ' + data.toString().trim());
         c.last_seen = moment().format("YYYY-MM-DD HH:mm:ss");
         m.socket.setTimeout(0);
         var d = JSON.parse(data);
@@ -207,7 +206,7 @@ config.miners.forEach(function(item, i, arr) {
             }
         }
 		
-		if (logstashLogger)
+		if (statsLogger)
 		{
 			var jsonWithoutError = {
 				"object"		: config.object_id,
@@ -233,19 +232,17 @@ config.miners.forEach(function(item, i, arr) {
 				jsonWithoutError["fan" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j*2+1], 10);
 			}
 
-			logstashLogger.info("got stats", jsonWithoutError);
+			statsLogger.info("got stats", jsonWithoutError);
             jsonWithoutError = {};
 		}
 	
     })
 
     .on('close', function() {
-        logger.info(m.name + ': connection closed');
         setTimeout(poll, m.poll);
     })
 
     .on('error', function(e) {
-        logger.error(m.name + ': socket error: ' + e.message);
         miners.json[i] = {
             "name"       : m.name,
             "host"       : hostname(),
@@ -266,7 +263,7 @@ config.miners.forEach(function(item, i, arr) {
             "last_seen"  : c.last_seen ? c.last_seen : 'never'
         };
 		
-		if (logstashLogger)
+		if (errorsLogger)
 		{
 			var jsonWithError = {
 				"object"	: config.object_id,
@@ -280,7 +277,7 @@ config.miners.forEach(function(item, i, arr) {
 				"error"		: miners.json[i].error,
 			};
 			
-			logstashLogger.info("got stats", jsonWithError);
+			errorsLogger.info("got stats", jsonWithError);
             jsonWithError = {};
 		}
 		
