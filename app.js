@@ -232,6 +232,13 @@ config.miners.forEach(function(item, i, arr) {
 				jsonWithoutError["temp" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j*2], 10);
 				jsonWithoutError["fan" + j.toString()] = parseInt(miners.json[i].temps.split(';')[j*2+1], 10);
 			}
+            
+            for (var j = miners.json[i].eth_hr.split(';').length; j < 6; ++j){
+				jsonWithoutError["eth" + j.toString() + "hr"] = null;
+				jsonWithoutError["dcr" + j.toString() + "hr"] = null;
+				jsonWithoutError["temp" + j.toString()] = null;
+				jsonWithoutError["fan" + j.toString()] = null;
+			}
 
 			statsLogger.info("got stats", jsonWithoutError);
             jsonWithoutError = {};
