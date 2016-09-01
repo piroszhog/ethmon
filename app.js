@@ -71,6 +71,8 @@ module.exports = app;
 
 var config = require('./config.json');
 
+if (config.use_another_config){ config = require(config.use_another_config); }
+
 var log4js = require('log4js');
 var logstashLogger;
 
